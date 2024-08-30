@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSA Simulator</title>
+  </head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      max-width: 90%;
+      margin: 0 auto;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(10, 40px);
+      grid-gap: 5px;
+      margin-bottom: 20px;
+    }
+
+    .cell {
+      width: 40px;
+      height: 40px;
+      background-color: #ddd;
+      border: 1px solid #999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .cell.start {
+      background-color: #4caf50;
+    }
+
+    .cell.end {
+      background-color: #f44336;
+    }
+
+    .cell.visited {
+      background-color: #2196f3;
+    }
+
+    .cell.path {
+      background-color: #ffeb3b;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    label {
+      margin-right: 10px;
+    }
+
+    select {
+      padding: 5px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+  <body>
+    <div class="container">
+      <h1>DSA Simulator</h1>
+      <div class="board" id="board"></div>
+      <div class="controls">
+        <label for="algorithm">Choose Algorithm:</label>
+        <select id="algorithm">
+          <option value="breadthFirstSearch">Breadth-First Search</option>
+          <option value="depthFirstSearch">Depth-First Search</option>
+          <option value="dijkstra">Dijkstra's Algorithm</option>
+          <option value="aStar">A* Algorithm</option>
+          <!-- Add more algorithms here -->
+        </select>
+        <button onclick="startSimulation()">Start Simulation</button>
+      </div>
+    </div>
+    <script>
+      const boardSize = 10;
+      let board = [];
+      let startCell = null;
+      let endCell = null;
+
+      function createBoard() {
+        const boardElement = document.getElementById("board");
+        for (let row = 0; row < boardSize; row++) {
+          board[row] = [];
+          for (let col = 0; col < boardSize; col++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            cell.addEventListener("click", () => selectCell(cell));
+            board[row][col] = cell;
+            boardElement.appendChild(cell);
+          }
+        }
+      }
+
+      function selectCell(cell) {
+        if (!startCell) {
+          startCell = cell;
+          cell.classList.add("start");
+        } else if (!endCell && cell !== startCell) {
+          endCell = cell;
+          cell.classList.add("end");
+        }
+      }
+
+      function startSimulation() {
+        if (startCell && endCell) {
+          const algorithm = document.getElementById("algorithm").value;
+          if (algorithm === "breadthFirstSearch") {
+            breadthFirstSearch(startCell, endCell);
+          } else if (algorithm === "depthFirstSearch") {
+            depthFirstSearch(startCell, endCell);
+          } else if (algorithm === "dijkstra") {
+            dijkstra(startCell, endCell);
+          } else if (algorithm === "aStar") {
+            aStar(startCell, endCell);
+          }
+        }
+      }
+
+      async function breadthFirstSearch(start, end) {
+        const queue = [start];
+        const visited = new Set();
+        visited.add(start);
+
+        while (queue.length > 0) {
+          const current = queue.shift();
+          current.classList.add("visited");
+          if (current === end) break;
+
+          const neighbors = getNeighbors(current);
+          for (const neighbor of neighbors) {
+            if (!visited.has(neighbor)) {
+              visited.add(neighbor);
+              queue.push(neighbor);
+              neighbor.classList.add("visited");
+            }
+          }
+          await sleep(100);
+        }
+      }
+
+      async function depthFirstSearch(start, end) {
+        const stack = [start];
+        const visited = new Set();
+        visited.add(start);
+
+        while (stack.length > 0) {
+          const current = stack.pop();
+          current.classList.add("visited");
+          if (current === end) break;
+
+          const neighbors = getNeighbors(current);
+          for (const neighbor of neighbors) {
+            if (!visited.has(neighbor)) {
+              visited.add(neighbor);
+              stack.push(neighbor);
+              neighbor.classList.add("visited");
+            }
+          }
+          await sleep(100);
+        }
+      }
+
+      async function dijkstra(start, end) {
+        // Implement Dijkstra's algorithm with visualization
+      }
+
+      async function aStar(start, end) {
+        // Implement A* algorithm with visualization
+      }
+
+      function getNeighbors(cell) {
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+        const neighbors = [];
+
+        if (row > 0) neighbors.push(board[row - 1][col]);
+        if (row < boardSize - 1) neighbors.push(board[row + 1][col]);
+        if (col > 0) neighbors.push(board[row][col - 1]);
+        if (col < boardSize - 1) neighbors.push(board[row][col + 1]);
+
+        return neighbors;
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      createBoard();
+    </script>
+  </body>
+</html>
